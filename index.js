@@ -27,12 +27,14 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    // Connect the client to the server	(optional starting in v4.7)
+    
     await client.connect();
 
+    const usersCollection = client.db("sportifyDb").collection("users");
     const CoursesCollection = client.db("sportifyDb").collection("Courses");
     const cartCollection = client.db("sportifyDb").collection("carts");
 
+    
     // api to get all the courses
     app.get('/courses', async(req, res)=>{
         const result = await CoursesCollection.find().toArray();
@@ -40,8 +42,14 @@ async function run() {
     })
   
 
+    // users related api 
+    app.post('/users', async(req, res)=>{
+      const user = req.body;
+      const result = await usersCollection.insertOne(user);
+      res.send(result);
+    })
  
-  //  cart collection
+  // classes related api, cart collection
   app.get('/carts', async(req, res)=>{
       const email = req.query.email;
       if(!email){
@@ -53,7 +61,6 @@ async function run() {
   });
   app.post('/carts' ,async(req, res)=>{
     const item = req.body;
-    console.log(item);
     const result = await cartCollection.insertOne(item);
     res.send(result);
   })
@@ -64,6 +71,8 @@ async function run() {
     const result = cartCollection.deleteOne(query);
     res.send(result);
   })
+
+
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
