@@ -2,6 +2,7 @@ const express = require('express');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const port = process.env.PORT || 5000;
 
@@ -27,6 +28,12 @@ async function run() {
     const usersCollection = client.db("sportifyDb").collection("users");
     const CoursesCollection = client.db("sportifyDb").collection("Courses");
     const cartCollection = client.db("sportifyDb").collection("carts");
+
+    app.post('/jwt', (req, res)=>{
+      const user = req.body;
+      const token = jwt.sign(user, env.process.ACCESS_TOKEN_SECRET,{ expiresIn: '1h' })
+      res.send({token})
+    })
 
     // API to get all the courses
     app.get('/courses', async (req, res) => {
