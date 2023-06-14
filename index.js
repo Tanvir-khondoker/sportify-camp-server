@@ -76,6 +76,39 @@ async function run() {
       res.send(result);
     });
 
+  //  security layers checking
+  // for admin
+app.get('/users/admin/:email', verifyJWT, async (req, res) => {
+  const email = req.params.email;
+
+  if (req.decoded.email !== email) {
+    return res.send({ admin: false });
+  }
+
+  const query = { email: email };
+  const user = await usersCollection.findOne(query);
+  const result = { admin: user?.role === 'admin' };
+  res.send(result);
+});
+
+// for instructor
+app.get('/users/instructor/:email', verifyJWT, async (req, res) => {
+  const email = req.params.email;
+
+  if (req.decoded.email !== email) {
+    return res.send({ instructor: false });
+  }
+
+  const query = { email: email };
+  const user = await usersCollection.findOne(query);
+  const result = { instructor: user?.role === 'instructor' };
+  res.send(result);
+});
+
+
+
+
+
     // Make admin API
     app.patch('/users/admin/:id', async (req, res) => {
       const id = req.params.id;
@@ -101,6 +134,15 @@ async function run() {
       const result = await usersCollection.updateOne(filter, updateDoc);
       res.send(result);
     });
+
+
+  // get all the instructors api 
+  app.get('/instructors', async (req, res) => {
+    const query = { role: 'instructor' };
+    const instructors = await usersCollection.find(query).toArray();
+  
+    res.send(instructors);
+  });
 
     // Classes related APIs, cart collection
     app.get('/carts', verifyJWT, async (req, res) => {
