@@ -76,7 +76,8 @@ async function run() {
 
     // API to get all the courses that's status approved
     app.get('/courses', async (req, res) => {
-      const result = await CoursesCollection.find({ status: "approved" }).toArray();
+      const query = { status: "approved" }
+      const result = await CoursesCollection.find(query).toArray();
       res.send(result);
     });
 
